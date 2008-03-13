@@ -74,7 +74,7 @@ for src in convertdict.keys():
 	if not os.path.isdir(os.path.split(dest)[0]):
 		os.makedirs(os.path.split(dest)[0])
 
-	title = artist = album = track = ""
+	title = artist = album = track = genre = ""
 	try:
 		tagInfo = MP4(src)
 		title = tagInfo.tags['\xa9nam'][0] if tagInfo.tags.has_key('\xa9nam') else ""
@@ -85,6 +85,7 @@ for src in convertdict.keys():
 		
 		album = tagInfo.tags['\xa9alb'][0] if tagInfo.tags.has_key('\xa9alb') else ""
 		track = str(tagInfo.tags['trkn'][0][0]) if tagInfo.tags.has_key('trkn') else ""
+		genre = tagInfo.tags['\xa9gen'] if tagInfo.tags.has_key('\xa9gen') else ""
 	except MP4StreamInfoError:
 		errstrings.append("ERROR: The file '" + src + "' seems to have invalid song information tags. Unfortunately, this means that the resulting MP3 file will not have embedded tags.")
 
@@ -108,6 +109,8 @@ for src in convertdict.keys():
 		subprocess.check_call([u'id3v2', u'-A', album, dest])
 	if track != "":
 		subprocess.check_call([u'id3v2', u'-T', track, dest])
+	if genre != "":
+		subprocess.check_call([u'id3v2', u'-g', genre, dest])
 
 	os.remove(wav)
 
