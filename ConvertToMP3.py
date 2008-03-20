@@ -26,6 +26,18 @@
 import commands, subprocess, os, sys
 from mutagen.mp4 import MP4, MP4StreamInfoError
 
+def getTag(tagInfo, primaryTag, secondaryTag = u""):
+	tagData = u""
+	if tagInfo.tags.has_key(primaryTag):
+		tagData = tagInfo.tags[primaryTag]
+	elif secondaryTag != u"" and tagInfo.tags.has_key(secondaryTag):
+		tagData = tagInfo.tags[secondaryTag]
+
+	while type(tagData) == list or type(tagData) == tuple:
+		tagData = tagData[0]
+	return str(tagData)
+
+
 errstrings = []
 
 if len(sys.argv) == 1:
@@ -77,15 +89,12 @@ for src in convertdict.keys():
 	title = artist = album = track = genre = ""
 	try:
 		tagInfo = MP4(src)
-		title = tagInfo.tags['\xa9nam'][0] if tagInfo.tags.has_key('\xa9nam') else ""
-		
-		albumartist = tagInfo.tags['aART'][0] if tagInfo.tags.has_key('aART') else ""
-		regularartist = tagInfo.tags['\xa9ART'][0] if tagInfo.tags.has_key('aART') else ""
-		artist = regularartist if regularartist != "" else albumartist
-		
-		album = tagInfo.tags['\xa9alb'][0] if tagInfo.tags.has_key('\xa9alb') else ""
-		track = str(tagInfo.tags['trkn'][0][0]) if tagInfo.tags.has_key('trkn') else ""
-		genre = tagInfo.tags['\xa9gen'] if tagInfo.tags.has_key('\xa9gen') else ""
+		title = getTag(tagInfo, '\xa9nam')
+		artist = getTag(tagInfo, '\xa9ART', 'aART')
+		album = getTag(tagInfo, '\xa9alb')
+		track = getTag(tagInfo, 'trkn')
+		genre = getTag(tagInfo, '\xa9gen')
+
 	except MP4StreamInfoError:
 		errstrings.append("ERROR: The file '" + src + "' seems to have invalid song information tags. Unfortunately, this means that the resulting MP3 file will not have embedded tags.")
 
