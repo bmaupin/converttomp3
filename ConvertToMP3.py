@@ -35,7 +35,10 @@ def getTag(tagInfo, primaryTag, secondaryTag = u""):
 
 	while type(tagData) == list or type(tagData) == tuple:
 		tagData = tagData[0]
-	return str(tagData)
+	
+	if type(tagData) != unicode:
+		tagData = str(tagData)
+	return tagData
 
 
 errstrings = []
