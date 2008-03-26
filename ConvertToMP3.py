@@ -45,8 +45,9 @@ errstrings = []
 
 if len(sys.argv) == 1:
 	print "ERROR: This program must be run with the name of the directory containing the M4A files as the first argument.\n"
-	print "Example:"
+	print "Examples:"
 	print "\t./ConvertToMP3.py /home/username/my_music"
+	print "\t./ConvertToMP3.py /media/music /tmp/destination"
 	sys.exit(1)
 
 convertdir = unicode(os.path.abspath(sys.argv[1]), 'UTF-8')
@@ -66,9 +67,12 @@ if len(m4as) == 1 and m4as[0] == u'':
 	sys.exit(3)
 
 destdir = os.path.normpath(convertdir) + u"_mp3"
+if len(sys.argv) == 3:
+	destdir = unicode(os.path.abspath(sys.argv[2]), 'UTF-8')
 if os.path.isdir(destdir):
 	print "ERROR: The destination directory '" + destdir + "' already exists. Please delete or rename this directory before running this program."
 	sys.exit(4)
+print "Converted MP3 files will be placed in '" + destdir + "'"
 
 os.makedirs(destdir)
 
@@ -80,11 +84,12 @@ for m4a in m4as:
 	destm4a = os.path.normpath(destdir + m4apostfix)[:-4] + u'.mp3'
 	convertdict[sourcem4a] = destm4a
 
+wav = u'converttomp3_outfile.wav'
 for src in convertdict.keys():
 	if not os.path.isfile(src):
 		print "ERROR: The file '" + src + "' does not exist. This should never happen; there must be an error in the program. Sorry :)"
 		sys.exit(5)
-	wav = os.path.split(src)[0] + u'/outfile.wav'
+
 	dest = convertdict[src]
 	if not os.path.isdir(os.path.split(dest)[0]):
 		os.makedirs(os.path.split(dest)[0])
@@ -124,6 +129,8 @@ for src in convertdict.keys():
 	if genre != "":
 		subprocess.check_call([u'id3v2', u'-g', genre, dest])
 
+
+if os.path.isfile(wav):
 	os.remove(wav)
 
 print "\n\n**************************************************************************\n\n"
