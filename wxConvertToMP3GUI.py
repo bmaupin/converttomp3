@@ -30,6 +30,7 @@ class MainFrame(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle("ConvertToMP3 0.5")
+        self.SetSize((800, 400))
         self.destination.Enable(False)
         self.destinationBrowse.Enable(False)
         self.status.SetForegroundColour(wx.Colour(255, 0, 0))
@@ -48,12 +49,11 @@ class MainFrame(wx.Frame):
         destinationBox.Add(self.destination, 1, wx.ALL|wx.EXPAND, 7)
         destinationBox.Add(self.destinationBrowse, 0, wx.RIGHT|wx.TOP|wx.BOTTOM, 7)
         mainSizer.Add(destinationBox, 0, wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND, 10)
-        mainSizer.Add((600, 250), 1, wx.EXPAND, 0)
+        mainSizer.Add((300, 50), 1, wx.EXPAND, 0)
         statusSizer.Add(self.status, 1, wx.ALIGN_CENTER_VERTICAL, 0)
         statusSizer.Add(self.beginConvert, 0, 0, 0)
         mainSizer.Add(statusSizer, 0, wx.ALL|wx.EXPAND, 10)
         self.SetSizer(mainSizer)
-        mainSizer.Fit(self)
         self.Layout()
         # end wxGlade
 
@@ -66,7 +66,7 @@ class ConvertFrame(wx.Frame):
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
         self.progressBox_staticbox = wx.StaticBox(self, -1, "Conversion Progress")
-        self.progress = wx.TextCtrl(self, -1, "")
+        self.progress = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
         self.status = wx.StaticText(self, -1, "Conversion in Progress. Please Wait...")
         self.exitButton = wx.Button(self, -1, "Exit")
 

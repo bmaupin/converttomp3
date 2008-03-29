@@ -62,7 +62,7 @@ for current, dirs, files in os.walk(convertdir, True):
 		if f.lower().endswith(".m4a"):
 			m4as.append(os.path.join(convertdir, current, f))
 
-if len(m4as) == 1 and m4as[0] == u'':
+if len(m4as) == 0 or (len(m4as) == 1 and m4as[0] == u''):
 	print "ERROR: No M4A files were found in the specified directory."
 	sys.exit(3)
 
@@ -84,7 +84,7 @@ for m4a in m4as:
 	destm4a = os.path.normpath(destdir + m4apostfix)[:-4] + u'.mp3'
 	convertdict[sourcem4a] = destm4a
 
-wav = u'converttomp3_outfile.wav'
+wav = u'/tmp/converttomp3_outfile.wav'
 for src in convertdict.keys():
 	if not os.path.isfile(src):
 		print "ERROR: The file '" + src + "' does not exist. This should never happen; there must be an error in the program. Sorry :)"
@@ -107,13 +107,13 @@ for src in convertdict.keys():
 		errstrings.append("ERROR: The file '" + src + "' seems to have invalid song information tags. Unfortunately, this means that the resulting MP3 file will not have embedded tags.")
 
 	try:
-		subprocess.check_call([u'mplayer', u'-ao', u'pcm', src, u'-ao', u'pcm:file=' + wav])
+		subprocess.check_call([u'mplayer', u'-quiet', u'-ao', u'pcm', src, u'-ao', u'pcm:file=' + wav])
 	except subprocess.CalledProcessError:
 		errstrings.append("ERROR: The file '" + src + "' could not be converted to a WAV with mplayer. The file may be corrupt.")
 		continue
 	
 	try:
-		subprocess.check_call([u'lame', u'-h', u'-b', u'192', wav, dest])
+		subprocess.check_call([u'lame', u'--quiet', u'-h', u'-b', u'192', wav, dest])
 	except subprocess.CalledProcessError:
 		errstrings.append("ERROR: The file '" + src + "' could not be converted to an MP3 with lame. An error has occurred.")
 		continue
