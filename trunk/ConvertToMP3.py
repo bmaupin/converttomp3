@@ -51,7 +51,7 @@ if len(sys.argv) == 1:
 	sys.exit(1)
 
 convertdir = unicode(os.path.abspath(sys.argv[1]), 'UTF-8')
-print "Attempting to convert M4A files in '" + convertdir + "'"
+print ("Attempting to convert M4A files in '" + convertdir + "'").encode('UTF-8')
 if not os.path.isdir(convertdir):
 	print "ERROR: The argument '" + convertdir + "' is not a directory."
 	sys.exit(2)
@@ -70,9 +70,9 @@ destdir = os.path.normpath(convertdir) + u"_mp3"
 if len(sys.argv) == 3:
 	destdir = unicode(os.path.abspath(sys.argv[2]), 'UTF-8')
 if os.path.isdir(destdir):
-	print "ERROR: The destination directory '" + destdir + "' already exists. Please delete or rename this directory before running this program."
+	print ("ERROR: The destination directory '" + destdir + "' already exists. Please delete or rename this directory before running this program.").encode('UTF-8')
 	sys.exit(4)
-print "Converted MP3 files will be placed in '" + destdir + "'"
+print ("Converted MP3 files will be placed in '" + destdir + "'").encode('UTF-8')
 
 os.makedirs(destdir)
 
@@ -87,7 +87,7 @@ for m4a in m4as:
 wav = u'/tmp/converttomp3_outfile.wav'
 for src in convertdict.keys():
 	if not os.path.isfile(src):
-		print "ERROR: The file '" + src + "' does not exist. This should never happen; there must be an error in the program. Sorry :)"
+		print ("ERROR: The file '" + src + "' does not exist. This should never happen; there must be an error in the program. Sorry :)").encode('UTF-8')
 		sys.exit(5)
 
 	dest = convertdict[src]
@@ -134,10 +134,10 @@ if os.path.isfile(wav):
 	os.remove(wav)
 
 print "\n\n**************************************************************************\n\n"
-print "MP3 files were created in the '" + destdir + "' directory."
+print ("MP3 files were created in the '" + destdir + "' directory.").encode('UTF-8')
 if len(errstrings) == 0:
 	print "Conversion succeeded! No errors occurred."
 else:
 	print "The following errors took place during conversion:"
 	for err in errstrings:
-		print err	
+		print err.encode('UTF-8')

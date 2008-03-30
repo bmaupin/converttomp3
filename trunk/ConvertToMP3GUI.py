@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import wx
+import os, sys, subprocess, fcntl
 from wxConvertToMP3GUI import *
 
 
@@ -11,8 +12,6 @@ class ConvertGUIStatusFrame(ConvertFrame):
         
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_BUTTON, self.onExitButton, self.exitButton)
-        self.Bind(wx.EVT_END_PROCESS, self.processEnded)
-        
         wx.CallLater(1000, self.idleLoop)
         
     def onClose(self, event):
@@ -22,31 +21,29 @@ class ConvertGUIStatusFrame(ConvertFrame):
         self.Close()
     
     def beginConversion(self, sourceDir, destDir):
-        cmd = u'python -u ConvertToMP3.py "' + sourceDir + u'" "' + destDir + u'"'
-        self.process = wx.Process(self)
-        self.process.Redirect()
-        pid = wx.Execute(cmd, wx.EXEC_ASYNC, self.process)
+        cmd = [unicode(sys.executable, 'UTF-8'), u'-u', u'ConvertToMP3.py', sourceDir, destDir]
+        fse = sys.getfilesystemencoding()
+        cmd = [arg.encode(fse) if isinstance(arg,unicode) else arg for arg in cmd]
+        self.process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ, cwd=os.getcwd())
+        flags = fcntl.fcntl(self.process.stdout, fcntl.F_GETFL)
+        fcntl.fcntl(self.process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
     
     def idleLoop(self):
         if self.process is not None:
-            stream = self.process.GetInputStream()
-            if stream.CanRead():
-                text = stream.read()
+            output_stream = self.process.stdout
+            try:
+                text = output_stream.read()
                 self.progress.AppendText(text + '\n')
-            wx.CallLater(1000, self.idleLoop)
+            except IOError, e:
+                if e.errno == 11:
+                    pass
+                else:
+                    raise
+            if self.process.poll() != None:
+                self.processEnded()
+        wx.CallLater(1000, self.idleLoop)
 
-    def processEnded(self, event):
-        stream = self.process.GetInputStream()
-        if stream.CanRead():
-            text = stream.read()
-            self.progress.AppendText(text)
-        
-        errStream = self.process.GetErrorStream()
-        if errStream.CanRead():
-            errText = errStream.read()
-            print errText
-        
-        self.process.Destroy()
+    def processEnded(self):
         self.process = None
         self.status.SetForegroundColour(wx.Colour(0,255,0))
         self.status.SetLabel("Conversion process complete")
