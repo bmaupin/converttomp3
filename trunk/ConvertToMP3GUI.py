@@ -1,4 +1,22 @@
 #!/usr/bin/python
+#
+#    Copyright (C) Brad Smith 2008
+#
+#    This file is ConvertToMP3GUI
+#
+#    ConvertToMP3GUI is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    ConvertToMP3GUI is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+#
 import wx
 import os, sys, subprocess, fcntl
 from wxConvertToMP3GUI import *
@@ -21,7 +39,8 @@ class ConvertGUIStatusFrame(ConvertFrame):
         self.Close()
     
     def beginConversion(self, sourceDir, destDir):
-        cmd = [unicode(sys.executable, 'UTF-8'), u'-u', u'ConvertToMP3.py', sourceDir, destDir]
+        convToMP3Path = os.path.join(os.path.dirname(__file__), u'ConvertToMP3.py')
+        cmd = [unicode(sys.executable, 'UTF-8'), u'-u', convToMP3Path, sourceDir, destDir]
         fse = sys.getfilesystemencoding()
         cmd = [arg.encode(fse) if isinstance(arg,unicode) else arg for arg in cmd]
         self.process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ, cwd=os.getcwd())
