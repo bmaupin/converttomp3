@@ -23,7 +23,7 @@
 #
 # Must install id3v2, mplayer, lame, python-mutagen
 
-import commands, subprocess, os, sys
+import commands, subprocess, os, sys, shutil
 from mutagen.mp4 import MP4, MP4StreamInfoError
 
 def getTag(tagInfo, primaryTag, secondaryTag = u""):
@@ -40,6 +40,13 @@ def getTag(tagInfo, primaryTag, secondaryTag = u""):
 		tagData = str(tagData)
 	return tagData
 
+def getFilesEnding(targetDir, endingIn):
+	results = []
+	for current, dirs, files in os.walk(targetDir, True):
+		for f in files:
+			if f.lower().endswith(endingIn):
+				results.append(os.path.join(targetDir, current, f))
+	return results
 
 errstrings = []
 
@@ -50,21 +57,16 @@ if len(sys.argv) == 1:
 	print "\t./ConvertToMP3.py /media/music /tmp/destination"
 	sys.exit(1)
 
+copymp3s = False
+if "--copymp3s" in sys.argv:
+	copymp3s = True
+	sys.argv.remove("--copymp3s")
+
 convertdir = unicode(os.path.abspath(sys.argv[1]), 'UTF-8')
 print ("Attempting to convert M4A files in '" + convertdir + "'").encode('UTF-8')
 if not os.path.isdir(convertdir):
 	print "ERROR: The argument '" + convertdir + "' is not a directory."
 	sys.exit(2)
-
-m4as = []
-for current, dirs, files in os.walk(convertdir, True):
-	for f in files:
-		if f.lower().endswith(".m4a"):
-			m4as.append(os.path.join(convertdir, current, f))
-
-if len(m4as) == 0 or (len(m4as) == 1 and m4as[0] == u''):
-	print "ERROR: No M4A files were found in the specified directory."
-	sys.exit(3)
 
 destdir = os.path.normpath(convertdir) + u"_mp3"
 if len(sys.argv) == 3:
@@ -72,9 +74,28 @@ if len(sys.argv) == 3:
 if os.path.isdir(destdir):
 	print ("ERROR: The destination directory '" + destdir + "' already exists. Please delete or rename this directory before running this program.").encode('UTF-8')
 	sys.exit(4)
-print ("Converted MP3 files will be placed in '" + destdir + "'").encode('UTF-8')
-
 os.makedirs(destdir)
+
+if copymp3s == True:
+	mp3s = getFilesEnding(convertdir, ".mp3")
+	for mp3 in mp3s:
+		sourcemp3 = os.path.normpath(os.path.join(convertdir, mp3))
+		srcprefix = os.path.commonprefix([convertdir, sourcemp3])
+		mp3postfix = mp3[len(srcprefix):]
+		destmp3 = os.path.normpath(destdir + mp3postfix)
+		destmp3dir = os.path.split(destmp3)[0]
+		if not os.path.isdir(destmp3dir):
+			os.makedirs(destmp3dir)
+		if not os.path.isfile(destmp3):
+			shutil.copy(sourcemp3, destmp3)
+
+m4as = getFilesEnding(convertdir, ".m4a")
+
+if len(m4as) == 0 or (len(m4as) == 1 and m4as[0] == u''):
+	print "ERROR: No M4A files were found in the specified directory."
+	sys.exit(3)
+
+print ("Converted MP3 files will be placed in '" + destdir + "'").encode('UTF-8')
 
 convertdict = {}
 for m4a in m4as:
@@ -84,6 +105,7 @@ for m4a in m4as:
 	destm4a = os.path.normpath(destdir + m4apostfix)[:-4] + u'.mp3'
 	convertdict[sourcem4a] = destm4a
 
+convertcount = 0
 wav = u'/tmp/converttomp3_outfile.wav'
 for src in convertdict.keys():
 	if not os.path.isfile(src):
@@ -129,12 +151,14 @@ for src in convertdict.keys():
 	if genre != "":
 		subprocess.check_call([u'id3v2', u'-g', genre, dest])
 
+	convertcount += 1
+
 
 if os.path.isfile(wav):
 	os.remove(wav)
 
 print "\n\n**************************************************************************\n\n"
-print ("MP3 files were created in the '" + destdir + "' directory.").encode('UTF-8')
+print (str(convertcount) + " MP3 files were created in the '" + destdir + "' directory.").encode('UTF-8')
 if len(errstrings) == 0:
 	print "Conversion succeeded! No errors occurred."
 else:
