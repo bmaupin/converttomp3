@@ -71,11 +71,14 @@ if not os.path.isdir(convertdir):
 destdir = os.path.normpath(convertdir) + u"_mp3"
 if len(sys.argv) == 3:
 	destdir = unicode(os.path.abspath(sys.argv[2]), 'UTF-8')
-if os.path.isdir(destdir):
-	print ("ERROR: The destination directory '" + destdir + "' already exists. Please delete or rename this directory before running this program.").encode('UTF-8')
-	sys.exit(4)
-os.makedirs(destdir)
 
+# If the directory doesn't exist, create it; otherwise, skip converting any files that already exist in the directory
+if os.path.isdir(destdir):
+	print ("The destination directory '" + destdir + "' already exists. Conversion will be skipped for any MP3s that already exist.").encode('UTF-8')
+else:
+	os.makedirs(destdir)
+
+copycount = 0
 if copymp3s == True:
 	mp3s = getFilesEnding(convertdir, ".mp3")
 	for mp3 in mp3s:
@@ -88,6 +91,7 @@ if copymp3s == True:
 			os.makedirs(destmp3dir)
 		if not os.path.isfile(destmp3):
 			shutil.copy(sourcemp3, destmp3)
+			copycount += 1
 
 m4as = getFilesEnding(convertdir, ".m4a")
 
@@ -106,6 +110,7 @@ for m4a in m4as:
 	convertdict[sourcem4a] = destm4a
 
 convertcount = 0
+skipcount = 0
 wav = u'/tmp/converttomp3_outfile.wav'
 for src in convertdict.keys():
 	if not os.path.isfile(src):
@@ -113,6 +118,11 @@ for src in convertdict.keys():
 		sys.exit(5)
 
 	dest = convertdict[src]
+	if os.path.isfile(dest):
+		print ("The file '" + dest + "' already exists. Conversion will be skipped.")
+		skipcount += 1
+		continue
+	
 	if not os.path.isdir(os.path.split(dest)[0]):
 		os.makedirs(os.path.split(dest)[0])
 
@@ -158,10 +168,14 @@ if os.path.isfile(wav):
 	os.remove(wav)
 
 print "\n\n**************************************************************************\n\n"
-print (str(convertcount) + " MP3 files were created in the '" + destdir + "' directory.").encode('UTF-8')
 if len(errstrings) == 0:
 	print "Conversion succeeded! No errors occurred."
 else:
 	print "The following errors took place during conversion:"
 	for err in errstrings:
 		print err.encode('UTF-8')
+if copycount > 0:
+	print (str(copycount) + " MP3 files were copied from the source directory.").encode('UTF-8')
+if skipcount > 0:
+	print (str(skipcount) + " MP3 files were not converted because they already existed in the destination directory.").encode('UTF-8')
+print (str(convertcount) + " MP3 files were created in the '" + destdir + "' directory.").encode('UTF-8')
