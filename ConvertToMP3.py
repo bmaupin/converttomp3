@@ -150,7 +150,7 @@ def main():
 		except subprocess.CalledProcessError:
 			errstrings.append("ERROR: The file '" + src + "' could not be converted to an MP3 with lame. An error has occurred.")
 			continue
-	
+
 		if title != "":
 			subprocess.check_call([u'id3v2', u'-t', title, dest])
 		if artist != "":
