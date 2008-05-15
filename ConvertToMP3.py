@@ -25,6 +25,7 @@
 
 import commands, subprocess, os, sys, shutil
 from mutagen.mp4 import MP4, MP4StreamInfoError
+from mutagen.id3 import ID3, TIT2, TPE1, TALB, TRCK, TCON, TIT1
 
 def getTag(tagInfo, primaryTag, secondaryTag = u""):
 	tagData = u""
@@ -37,7 +38,7 @@ def getTag(tagInfo, primaryTag, secondaryTag = u""):
 		tagData = tagData[0]
 	
 	if type(tagData) != unicode:
-		tagData = str(tagData)
+		tagData = unicode(tagData)
 	return tagData
 
 def getFilesEnding(targetDir, endingIn):
@@ -127,7 +128,7 @@ def main():
 		if not os.path.isdir(os.path.split(dest)[0]):
 			os.makedirs(os.path.split(dest)[0])
 	
-		title = artist = album = track = genre = ""
+		title = artist = album = track = genre = group = u""
 		try:
 			tagInfo = MP4(src)
 			title = getTag(tagInfo, '\xa9nam')
@@ -135,6 +136,7 @@ def main():
 			album = getTag(tagInfo, '\xa9alb')
 			track = getTag(tagInfo, 'trkn')
 			genre = getTag(tagInfo, '\xa9gen')
+			group = getTag(tagInfo, '\xa9grp')
 	
 		except MP4StreamInfoError:
 			errstrings.append("ERROR: The file '" + src + "' seems to have invalid song information tags. Unfortunately, this means that the resulting MP3 file will not have embedded tags.")
@@ -151,17 +153,21 @@ def main():
 			errstrings.append("ERROR: The file '" + src + "' could not be converted to an MP3 with lame. An error has occurred.")
 			continue
 
-		if title != "":
-			subprocess.check_call([u'id3v2', u'-t', title, dest])
-		if artist != "":
-			subprocess.check_call([u'id3v2', u'-a', artist, dest])
-		if album != "":
-			subprocess.check_call([u'id3v2', u'-A', album, dest])
-		if track != "":
-			subprocess.check_call([u'id3v2', u'-T', track, dest])
-		if genre != "":
-			subprocess.check_call([u'id3v2', u'-g', genre, dest])
-	
+		destTagInfo = ID3()
+		if title != u"":
+			destTagInfo.add(TIT2(encoding=3, text=title))
+		if artist != u"":
+			destTagInfo.add(TPE1(encoding=3, text=artist))
+		if album != u"":
+			destTagInfo.add(TALB(encoding=3, text=album))
+		if track != u"":
+			destTagInfo.add(TRCK(encoding=3, text=track))
+		if genre != u"":
+			destTagInfo.add(TCON(encoding=3, text=genre))
+		if group != u"":
+			destTagInfo.add(TIT1(encoding=3, text=group))
+		destTagInfo.save(dest)
+
 		convertcount += 1
 	
 	
