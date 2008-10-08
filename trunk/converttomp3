@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/bin/python /usr/lib/converttomp3/ConvertToMP3GUI.py

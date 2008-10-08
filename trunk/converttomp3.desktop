@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Convert To MP3
+Comment=Convert a folder of M4A files to MP3 files
+Exec=/usr/bin/converttomp3
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;AudioVideo;
+StartupNotify=false
+
