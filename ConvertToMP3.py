@@ -25,7 +25,7 @@
 
 import commands, subprocess, os, sys, shutil
 from mutagen.mp4 import MP4, MP4StreamInfoError
-from mutagen.id3 import ID3, TIT2, TPE1, TALB, TRCK, TCON, TIT1
+from mutagen.id3 import ID3, TIT2, TPE1, TALB, TRCK, TCON, TIT1, TYER, COMM
 
 def getTag(tagInfo, primaryTag, secondaryTag = u""):
 	tagData = u""
@@ -128,7 +128,7 @@ def main():
 		if not os.path.isdir(os.path.split(dest)[0]):
 			os.makedirs(os.path.split(dest)[0])
 	
-		title = artist = album = track = genre = group = u""
+		title = artist = album = track = genre = year = comment = group = u""
 		try:
 			tagInfo = MP4(src)
 			title = getTag(tagInfo, '\xa9nam')
@@ -136,6 +136,8 @@ def main():
 			album = getTag(tagInfo, '\xa9alb')
 			track = getTag(tagInfo, 'trkn')
 			genre = getTag(tagInfo, '\xa9gen')
+			year = getTag(tagInfo, '\xa9day')
+			comment = getTag(tagInfo, '\xa9cmt')
 			group = getTag(tagInfo, '\xa9grp')
 	
 		except MP4StreamInfoError:
@@ -164,6 +166,10 @@ def main():
 			destTagInfo.add(TRCK(encoding=3, text=track))
 		if genre != u"":
 			destTagInfo.add(TCON(encoding=3, text=genre))
+		if year != u"":
+			destTagInfo.add(TYER(encoding=3, text=year))
+		if comment != u"":
+			destTagInfo.add(COMM(encoding=3, text=comment))
 		if group != u"":
 			destTagInfo.add(TIT1(encoding=3, text=group))
 		destTagInfo.save(dest)
