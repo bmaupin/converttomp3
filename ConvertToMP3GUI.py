@@ -2,7 +2,7 @@
 #
 #    Copyright (C) Brad Smith 2008
 #
-#    This file is ConvertToMP3GUI
+#    This file is part of ConvertToMP3GUI
 #
 #    ConvertToMP3GUI is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-#
+#    along with ConvertToMP3GUI.  If not, see <http://www.gnu.org/licenses/>.
+
 import wx
 import os, sys, subprocess, fcntl
 from wxConvertToMP3GUI import *
