@@ -2,7 +2,7 @@
 #
 #    Copyright (C) Brad Smith 2008
 #
-#    This file is ConvertToMP3
+#    This file is part of ConvertToMP3
 #
 #    ConvertToMP3 is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+#    along with ConvertToMP3.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
 # A script to convert non-DRM'd iTunes M4A files to MP3 so they will
