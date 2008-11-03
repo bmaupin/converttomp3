@@ -23,7 +23,7 @@
 #
 # Must install id3v2, mplayer, lame, python-mutagen
 
-import commands, subprocess, os, sys, shutil
+import subprocess, os, sys, shutil
 from mutagen.mp4 import MP4, MP4StreamInfoError
 from mutagen.id3 import ID3, TIT2, TPE1, TALB, TRCK, TCON, TIT1, TYER, COMM
 
@@ -43,7 +43,7 @@ def getTag(tagInfo, primaryTag, secondaryTag = u""):
 
 def getFilesEnding(targetDir, endingIn):
     results = []
-    for current, dirs, files in os.walk(targetDir, True):
+    for current, _, files in os.walk(targetDir, True):
         for f in files:
             if f.lower().endswith(endingIn):
                 results.append(os.path.join(targetDir, current, f))

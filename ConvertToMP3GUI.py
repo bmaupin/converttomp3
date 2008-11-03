@@ -19,7 +19,7 @@
 
 import wx
 import os, sys, subprocess, fcntl
-from wxConvertToMP3GUI import *
+from wxConvertToMP3GUI import MainFrame, ConvertFrame
 
 
 class ConvertGUIStatusFrame(ConvertFrame):
@@ -32,10 +32,10 @@ class ConvertGUIStatusFrame(ConvertFrame):
         self.Bind(wx.EVT_BUTTON, self.onExitButton, self.exitButton)
         wx.CallLater(1000, self.idleLoop)
 
-    def onClose(self, event):
+    def onClose(self, _event):
         self.GetParent().Close()
 
-    def onExitButton(self, event):
+    def onExitButton(self, _event):
         self.Close()
 
     def beginConversion(self, sourceDir, destDir):
@@ -74,12 +74,12 @@ class ConvertGUIMainFrame(MainFrame):
         self.Bind(wx.EVT_BUTTON, self.onToConvertBrowse, self.toConvertBrowse)
         self.Bind(wx.EVT_TEXT, self.onToConvertText, self.toConvert)
 
-    def onToConvertBrowse(self, event):
+    def onToConvertBrowse(self, _event):
         dd = wx.DirDialog(None, style=wx.DD_DIR_MUST_EXIST)
         if dd.ShowModal() == wx.ID_OK:
             self.toConvert.SetValue(dd.GetPath())
 
-    def onToConvertText(self, event):
+    def onToConvertText(self, _event):
         if self.toConvert.GetValue() != "":
             self.status.SetForegroundColour(wx.Colour(0,255,0))
             self.destination.Enable()
@@ -98,7 +98,7 @@ class ConvertGUIMainFrame(MainFrame):
             self.status.SetLabel("Please select a directory containing music files")
             self.destination.SetValue("")
 
-    def onBeginConvert(self, event):
+    def onBeginConvert(self, _event):
         self.Hide()
         statusFrame = ConvertGUIStatusFrame(self, -1, "")
         statusFrame.SetSize(self.GetSize())
