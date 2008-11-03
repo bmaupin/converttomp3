@@ -25,19 +25,19 @@ from wxConvertToMP3GUI import *
 class ConvertGUIStatusFrame(ConvertFrame):
     def __init__(self, *args, **kwds):
         ConvertFrame.__init__(self, *args, **kwds)
-        
+
         self.process = None
-        
+
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Bind(wx.EVT_BUTTON, self.onExitButton, self.exitButton)
         wx.CallLater(1000, self.idleLoop)
-        
+
     def onClose(self, event):
         self.GetParent().Close()
-    
+
     def onExitButton(self, event):
         self.Close()
-    
+
     def beginConversion(self, sourceDir, destDir):
         convToMP3Path = os.path.join(os.path.dirname(__file__), u'ConvertToMP3.py')
         cmd = [unicode(sys.executable, 'UTF-8'), u'-u', convToMP3Path, sourceDir, destDir]
@@ -46,7 +46,7 @@ class ConvertGUIStatusFrame(ConvertFrame):
         self.process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ, cwd=os.getcwd())
         flags = fcntl.fcntl(self.process.stdout, fcntl.F_GETFL)
         fcntl.fcntl(self.process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
-    
+
     def idleLoop(self):
         if self.process is not None:
             output_stream = self.process.stdout
