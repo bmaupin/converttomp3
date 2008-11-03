@@ -17,8 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with ConvertToMP3.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys, shutil, subprocess
-from mutagen.mp4 import MP4, MP4StreamInfoError
+import os, shutil, subprocess
+from mutagen.mp4 import MP4
 from mutagen.mp3 import MP3
 
 import ConvertToMP3
@@ -35,7 +35,7 @@ def uncommonPostfix(file1, file2):
 def getSrcAndExpectedDestFiles(srcDir, destDir, srcEnding, destEnding):
     srcFiles = []
     expectedDestFiles = []
-    for current, dirs, files in os.walk(srcDir, True):
+    for current, _, files in os.walk(srcDir, True):
         for f in files:
             if f.lower().endswith(srcEnding):
                 srcFile = os.path.join(srcDir, current, f)
@@ -95,9 +95,9 @@ def checkTags(srcFile, destFile):
 def ensureConversion(srcDir, destDir, srcType, destType):
     (srcFiles, expectedDestFiles) = getSrcAndExpectedDestFiles(srcDir, destDir, srcType, destType)
     destFiles = ConvertToMP3.getFilesEnding(destDir, destType)
-    for file in expectedDestFiles:
-        if file not in destFiles:
-            testerrors.append('Conversion failed: ' + file + ' was not found.')
+    for f in expectedDestFiles:
+        if f not in destFiles:
+            testerrors.append('Conversion failed: ' + f + ' was not found.')
             return False
     for (src, dest) in zip(srcFiles, expectedDestFiles):
         if checkTags(src, dest) == False:
@@ -111,14 +111,14 @@ def main():
     srcDir1 = u"/home/bnsmith/download/playing/converttomp3_testing/El Ma\xf1ana Test Root"
     destDir1 = u"/home/bnsmith/download/playing/converttomp3_test_results/El Ma\xf1ana Test Results"
     if os.path.isdir(destDir1):
-       shutil.rmtree(destDir1)
+        shutil.rmtree(destDir1)
     subprocess.check_call([u"python", u"ConvertToMP3.py", srcDir1, destDir1])
     results.append(ensureConversion(srcDir1, destDir1, u".m4a", u".mp3"))
 
     srcDir2 = u"/home/bnsmith/download/playing/converttomp3_testing/WONKY-FILES_ROOT"
     destDir2 = u"/home/bnsmith/download/playing/converttomp3_test_results/WONKY-FILES_ROOT_RESULTS"
     if os.path.isdir(destDir2):
-       shutil.rmtree(destDir2)
+        shutil.rmtree(destDir2)
     subprocess.check_call([u"python", u"ConvertToMP3.py", srcDir2, destDir2])
     results.append(ensureConversion(srcDir2, destDir2, u".m4a", u".mp3"))
 
