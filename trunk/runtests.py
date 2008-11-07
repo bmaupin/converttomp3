@@ -43,7 +43,8 @@ def getSrcAndExpectedDestFiles(srcDir, destDir, srcEnding, destEnding):
                 srcFileName = os.path.split(srcFile)[1]
                 srcFileNoExt = srcFileName[:-(len(srcEnding))]
                 relativePath = uncommonPostfix(srcDir, current)
-                destFile = os.path.join(os.path.normpath(destDir + relativePath), srcFileNoExt + destEnding)
+                destFile = os.path.join(os.path.normpath(destDir + relativePath
+                                        ), srcFileNoExt + destEnding)
                 expectedDestFiles.append(destFile)
     return (srcFiles, expectedDestFiles)
 
@@ -61,19 +62,13 @@ def tagEqual(srcFile, destFile, tagType):
 
     srcTagName = tagNameMap[tagType][0]
     destTagName = tagNameMap[tagType][1]
-    if srcTagInfo.tags.has_key(srcTagName) == False and destTagInfo.tags.has_key(destTagName) == False:
+    if srcTagInfo.tags.has_key(srcTagName) == False \
+                and destTagInfo.tags.has_key(destTagName) == False:
         return True
-    if srcTagInfo.tags.has_key(srcTagName) == True and destTagInfo.tags.has_key(destTagName) == False:
+    if srcTagInfo.tags.has_key(srcTagName) == True \
+                and destTagInfo.tags.has_key(destTagName) == False:
         return False
 
-    # Not sure what's going on with encodings here. It seems like the M4A library
-    # returns unicode strings with the latin-1 encoding, so calling 'encode' with 'UTF-8' returns
-    # a byte string that is unchanged and still in latin-1. When the MP3 library has its tag
-    # object cast to a unicode string, it seems to be encoded in UTF-8, and so needs to be
-    # encoded as latin-1 to be compared with the M4A string.
-    # Update: this oddity may have been related to previously calling executing the program 'id3v2'
-    # to tag the MP3 files. Now that both tagging the MP3s and reading the tags are done with mutagen,
-    # it seems to work more consistently.
     srcTag = srcTagInfo.tags[srcTagName]
     while type(srcTag) == list or type(srcTag) == tuple:
         srcTag = srcTag[0]
@@ -82,7 +77,8 @@ def tagEqual(srcFile, destFile, tagType):
     srcTagStr = srcTag.encode('UTF-8')
     destTagStr = unicode(destTagInfo.tags[destTagName]).encode('UTF-8')
     if srcTagStr != destTagStr:
-        testerrors.append('Conversion failed: ' + tagType + ' did not match: ' + srcTagStr + ' ' + destTagStr)
+        testerrors.append('Conversion failed: ' + tagType +
+                          ' did not match: ' + srcTagStr + ' ' + destTagStr)
         return False
     return True
 
@@ -93,7 +89,8 @@ def checkTags(srcFile, destFile):
     return True
 
 def ensureConversion(srcDir, destDir, srcType, destType):
-    (srcFiles, expectedDestFiles) = getSrcAndExpectedDestFiles(srcDir, destDir, srcType, destType)
+    (srcFiles, expectedDestFiles) = getSrcAndExpectedDestFiles(srcDir, destDir,
+                                                            srcType, destType)
     destFiles = ConvertToMP3.getFilesEnding(destDir, destType)
     for f in expectedDestFiles:
         if f not in destFiles:
@@ -101,22 +98,27 @@ def ensureConversion(srcDir, destDir, srcType, destType):
             return False
     for (src, dest) in zip(srcFiles, expectedDestFiles):
         if checkTags(src, dest) == False:
-            testerrors.append('Conversion failed: ' + dest + ' had incorrect tags.')
+            testerrors.append('Conversion failed: ' + dest +
+                              ' had incorrect tags.')
             return False
     return True
 
 def main():
     results = []
 
-    srcDir1 = u"/home/bnsmith/download/playing/converttomp3_testing/El Ma\xf1ana Test Root"
-    destDir1 = u"/home/bnsmith/download/playing/converttomp3_test_results/El Ma\xf1ana Test Results"
+    srcDir1 = u"/home/bnsmith/download/playing/converttomp3_testing/" \
+              u"El Ma\xf1ana Test Root"
+    destDir1 = u"/home/bnsmith/download/playing/converttomp3_test_results/" \
+               u"El Ma\xf1ana Test Results"
     if os.path.isdir(destDir1):
         shutil.rmtree(destDir1)
     subprocess.check_call([u"python", u"ConvertToMP3.py", srcDir1, destDir1])
     results.append(ensureConversion(srcDir1, destDir1, u".m4a", u".mp3"))
 
-    srcDir2 = u"/home/bnsmith/download/playing/converttomp3_testing/WONKY-FILES_ROOT"
-    destDir2 = u"/home/bnsmith/download/playing/converttomp3_test_results/WONKY-FILES_ROOT_RESULTS"
+    srcDir2 = u"/home/bnsmith/download/playing/converttomp3_testing/" \
+              u"WONKY-FILES_ROOT"
+    destDir2 = u"/home/bnsmith/download/playing/converttomp3_test_results/" \
+              u"WONKY-FILES_ROOT_RESULTS"
     if os.path.isdir(destDir2):
         shutil.rmtree(destDir2)
     subprocess.check_call([u"python", u"ConvertToMP3.py", srcDir2, destDir2])
@@ -127,12 +129,12 @@ def main():
         if res == False:
             allSucceeded = False
 
-    print "\n**************************************************************************"
+    print "\n***********************************************************"
     if allSucceeded == True:
         print "Tests succeeded!"
     else:
         print "Tests failed!"
-    print "**************************************************************************"
+    print "***********************************************************"
 
     for err in testerrors:
         print err

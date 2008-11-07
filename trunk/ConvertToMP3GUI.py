@@ -39,11 +39,16 @@ class ConvertGUIStatusFrame(ConvertFrame):
         self.Close()
 
     def beginConversion(self, sourceDir, destDir):
-        convToMP3Path = os.path.join(os.path.dirname(__file__), u'ConvertToMP3.py')
-        cmd = [unicode(sys.executable, 'UTF-8'), u'-u', convToMP3Path, sourceDir, destDir]
+        convToMP3Path = os.path.join(os.path.dirname(__file__),
+                                     u'ConvertToMP3.py')
+        cmd = [unicode(sys.executable, 'UTF-8'), u'-u',
+               convToMP3Path, sourceDir, destDir]
         fse = sys.getfilesystemencoding()
-        cmd = [arg.encode(fse) if isinstance(arg,unicode) else arg for arg in cmd]
-        self.process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ, cwd=os.getcwd())
+        cmd = [arg.encode(fse) if isinstance(arg, unicode) else arg for arg in cmd]
+        self.process = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT,
+                                        env=os.environ, cwd=os.getcwd())
         flags = fcntl.fcntl(self.process.stdout, fcntl.F_GETFL)
         fcntl.fcntl(self.process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
@@ -64,7 +69,7 @@ class ConvertGUIStatusFrame(ConvertFrame):
 
     def processEnded(self):
         self.process = None
-        self.status.SetForegroundColour(wx.Colour(0,255,0))
+        self.status.SetForegroundColour(wx.Colour(0, 255, 0))
         self.status.SetLabel("Conversion process complete")
 
 class ConvertGUIMainFrame(MainFrame):
@@ -81,7 +86,7 @@ class ConvertGUIMainFrame(MainFrame):
 
     def onToConvertText(self, _event):
         if self.toConvert.GetValue() != "":
-            self.status.SetForegroundColour(wx.Colour(0,255,0))
+            self.status.SetForegroundColour(wx.Colour(0, 255, 0))
             self.destination.Enable()
             self.destinationBrowse.Enable()
             self.beginConvert.Enable()
@@ -91,11 +96,12 @@ class ConvertGUIMainFrame(MainFrame):
                 src = src[:-1]
             self.destination.SetValue(src + "_mp3")
         else:
-            self.status.SetForegroundColour(wx.Colour(255,0,0))
+            self.status.SetForegroundColour(wx.Colour(255, 0, 0))
             self.destination.Enable(False)
             self.destinationBrowse.Enable(False)
             self.beginConvert.Enable(False)
-            self.status.SetLabel("Please select a directory containing music files")
+            self.status.SetLabel("Please select a directory " \
+                                 "containing music files")
             self.destination.SetValue("")
 
     def onBeginConvert(self, _event):
@@ -104,7 +110,8 @@ class ConvertGUIMainFrame(MainFrame):
         statusFrame.SetSize(self.GetSize())
         statusFrame.SetPosition(self.GetPosition())
         statusFrame.Show()
-        statusFrame.beginConversion(self.toConvert.GetValue(), self.destination.GetValue())
+        statusFrame.beginConversion(self.toConvert.GetValue(),
+                                    self.destination.GetValue())
 
 
 if __name__ == "__main__":

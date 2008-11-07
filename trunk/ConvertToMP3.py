@@ -53,7 +53,8 @@ def main():
     errstrings = []
 
     if len(sys.argv) == 1:
-        print "ERROR: This program must be run with the name of the directory containing the M4A files as the first argument.\n"
+        print "ERROR: This program must be run with the name of the " \
+              "directory containing the M4A files as the first argument.\n"
         print "Examples:"
         print "\t./ConvertToMP3.py /home/username/my_music"
         print "\t./ConvertToMP3.py /media/music /tmp/destination"
@@ -65,7 +66,8 @@ def main():
         sys.argv.remove("--copymp3s")
 
     convertdir = unicode(os.path.abspath(sys.argv[1]), 'UTF-8')
-    print ("Attempting to convert M4A files in '" + convertdir + "'").encode('UTF-8')
+    print ("Attempting to convert M4A files in '" +
+           convertdir + "'").encode('UTF-8')
     if not os.path.isdir(convertdir):
         print "ERROR: The argument '" + convertdir + "' is not a directory."
         sys.exit(2)
@@ -74,9 +76,12 @@ def main():
     if len(sys.argv) == 3:
         destdir = unicode(os.path.abspath(sys.argv[2]), 'UTF-8')
 
-    # If the directory doesn't exist, create it; otherwise, skip converting any files that already exist in the directory
+    # If the directory doesn't exist, create it; otherwise,
+    # skip converting any files that already exist in the directory
     if os.path.isdir(destdir):
-        print ("The destination directory '" + destdir + "' already exists. Conversion will be skipped for any MP3s that already exist.").encode('UTF-8')
+        print ("The destination directory '" + destdir + "' already exists. " \
+               "Conversion will be skipped for any MP3s that already " \
+               "exist.").encode('UTF-8')
     else:
         os.makedirs(destdir)
 
@@ -101,7 +106,8 @@ def main():
         print "ERROR: No M4A files were found in the specified directory."
         sys.exit(3)
 
-    print ("Converted MP3 files will be placed in '" + destdir + "'").encode('UTF-8')
+    print ("Converted MP3 files will be placed in '" +
+           destdir + "'").encode('UTF-8')
 
     convertdict = {}
     for m4a in m4as:
@@ -116,12 +122,13 @@ def main():
     wav = u'/tmp/converttomp3_outfile.wav'
     for src in convertdict.keys():
         if not os.path.isfile(src):
-            print ("ERROR: The file '" + src + "' does not exist. This should never happen; there must be an error in the program. Sorry :)").encode('UTF-8')
-            sys.exit(5)
+            errstrings.append("ERROR: The file '" + src + "' does not exist.")
+            continue
 
         dest = convertdict[src]
         if os.path.isfile(dest):
-            print ("The file '" + dest + "' already exists. Conversion will be skipped.")
+            print ("The file '" + dest + "' already exists. " \
+                   "Conversion will be skipped.").encode('UTF-8')
             skipcount += 1
             continue
 
@@ -141,18 +148,28 @@ def main():
             group = getTag(tagInfo, '\xa9grp')
 
         except MP4StreamInfoError:
-            errstrings.append("ERROR: The file '" + src + "' seems to have invalid song information tags. Unfortunately, this means that the resulting MP3 file will not have embedded tags.")
+            errstrings.append("ERROR: The file '" + src + "' seems to have " \
+                              "invalid song information tags. " \
+                              "Unfortunately, this means that " \
+                              "the resulting MP3 file will not have " \
+                              "embedded tags.")
 
         try:
-            subprocess.check_call([u'mplayer', u'-quiet', u'-ao', u'pcm', src, u'-ao', u'pcm:file=' + wav])
+            subprocess.check_call([u'mplayer', u'-quiet', u'-ao', u'pcm', src,
+                                   u'-ao', u'pcm:file=' + wav])
         except subprocess.CalledProcessError:
-            errstrings.append("ERROR: The file '" + src + "' could not be converted to a WAV with mplayer. The file may be corrupt.")
+            errstrings.append("ERROR: The file '" + src + "' could not be " \
+                              "converted to a WAV with mplayer. The file " \
+                              "may be corrupt.")
             continue
 
         try:
-            subprocess.check_call([u'lame', u'--quiet', u'-h', u'-b', u'192', wav, dest])
+            subprocess.check_call([u'lame', u'--quiet', u'-h', u'-b',
+                                   u'192', wav, dest])
         except subprocess.CalledProcessError:
-            errstrings.append("ERROR: The file '" + src + "' could not be converted to an MP3 with lame. An error has occurred.")
+            errstrings.append("ERROR: The file '" + src + "' could not be " \
+                              "converted to an MP3 with lame. An error " \
+                              "has occurred.")
             continue
 
         destTagInfo = ID3()
@@ -180,7 +197,7 @@ def main():
     if os.path.isfile(wav):
         os.remove(wav)
 
-    print "\n\n**************************************************************************\n\n"
+    print "\n\n***********************************************************\n\n"
     if len(errstrings) == 0:
         print "Conversion succeeded! No errors occurred."
     else:
@@ -188,10 +205,13 @@ def main():
         for err in errstrings:
             print err.encode('UTF-8')
     if copycount > 0:
-        print (str(copycount) + " MP3 files were copied from the source directory.").encode('UTF-8')
+        print (str(copycount) + " MP3 files were copied " \
+               "from the source directory.").encode('UTF-8')
     if skipcount > 0:
-        print (str(skipcount) + " MP3 files were not converted because they already existed in the destination directory.").encode('UTF-8')
-    print (str(convertcount) + " MP3 files were created in the '" + destdir + "' directory.").encode('UTF-8')
+        print (str(skipcount) + " MP3 files were not converted because they " \
+               "already existed in the destination directory.").encode('UTF-8')
+    print (str(convertcount) + " MP3 files were created in the '" + destdir +
+           "' directory.").encode('UTF-8')
 
 if __name__ == '__main__':
     main()
