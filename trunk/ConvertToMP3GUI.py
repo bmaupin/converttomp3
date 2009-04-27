@@ -17,6 +17,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with ConvertToMP3GUI.  If not, see <http://www.gnu.org/licenses/>.
 
+import wxversion
+try:
+    wxversion.select('2.8')
+except wxversion.VersionError:
+    wxversion.select('2.6')
 import wx
 import os, sys, subprocess, fcntl
 from wxConvertToMP3GUI import MainFrame, ConvertFrame
